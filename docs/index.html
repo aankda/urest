@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Urest | Universal Restoration for the Modern Web</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #030712;
+            --card: #111827;
+            --brand: #6366f1;
+            --neon: #818cf8;
+            --text: #f9fafb;
+            --muted: #9ca3af;
+            --firefox: linear-gradient(135deg, #ff7139 0%, #8c4fff 100%);
+            --edge: linear-gradient(135deg, #0078d7 0%, #00a4ef 100%);
+        }
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        .container { max-width: 1000px; margin: 0 auto; padding: 6rem 2rem; }
+        .hero { display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 8rem; }
+        .logo { width: 100px; height: 100px; border-radius: 24px; margin-bottom: 2rem; box-shadow: 0 0 30px rgba(99, 102, 241, 0.2); transition: transform 0.3s ease; }
+        .logo:hover { transform: scale(1.05); }
+        h1 { font-size: clamp(3rem, 10vw, 4.5rem); font-weight: 900; margin: 0; letter-spacing: -0.04em; line-height: 1; }
+        h1 span { color: var(--neon); }
+        .tagline { font-size: 1.25rem; color: var(--muted); margin-top: 2rem; max-width: 600px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin: 4rem 0; }
+        .card { 
+            background: var(--card); 
+            padding: 2.5rem; 
+            border-radius: 28px; 
+            border: 1px solid rgba(255,255,255,0.05); 
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .card:hover { 
+            transform: translateY(-10px); 
+            border-color: rgba(99, 102, 241, 0.3); 
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5); 
+        }
+        .card h3 { color: var(--neon); margin-top: 0; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.1em; }
+        .btn-group { display: flex; gap: 1rem; justify-content: center; margin-top: 2rem; }
+        .btn { 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            padding: 1rem 2rem; 
+            border-radius: 14px; 
+            font-weight: 700; 
+            text-decoration: none; 
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .btn svg { 
+            width: 22px; 
+            height: 22px; 
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .btn:hover svg {
+            transform: scale(1.1) rotate(-8deg);
+        }
+        .btn-firefox { 
+            background: linear-gradient(135deg, #FF7139 0%, #8C4FFF 100%);
+            color: #fff; 
+            border: none;
+            box-shadow: 0 4px 15px rgba(255, 113, 57, 0.3);
+        }
+        .btn-edge { 
+            background: linear-gradient(135deg, #0078D7 0%, #00A4EF 100%);
+            color: #fff; 
+            border: none;
+            box-shadow: 0 4px 15px rgba(0, 120, 215, 0.3);
+        }
+        .btn:hover { 
+            transform: translateY(-4px); 
+            filter: brightness(1.1); 
+        }
+        .btn-firefox:hover { 
+            box-shadow: 0 8px 25px rgba(255, 113, 57, 0.5); 
+        }
+        .btn-edge:hover { 
+            box-shadow: 0 8px 25px rgba(0, 120, 215, 0.5); 
+        }
+        .badge { display: inline-block; padding: 0.4rem 0.8rem; border-radius: 100px; background: rgba(99, 102, 241, 0.1); color: var(--neon); font-size: 0.75rem; font-weight: 700; margin-bottom: 1.5rem; border: 1px solid rgba(99, 102, 241, 0.2); text-transform: uppercase; letter-spacing: 0.1em; }
+        section { margin-top: 6rem; padding-top: 4rem; border-top: 1px solid rgba(255,255,255,0.05); }
+        .btn-group { display: flex; gap: 1rem; justify-content: center; margin-top: 3.5rem; }
+        .section-title { text-align: center; margin-bottom: 3rem; }
+        .section-title h2 { font-size: 2.5rem; font-weight: 900; margin: 0; }
+        .feature-icon { font-size: 2.5rem; margin-bottom: 1.5rem; display: block; }
+        code { background: rgba(129, 140, 248, 0.1); color: var(--neon); padding: 0.2rem 0.4rem; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="hero">
+            <img src="icon128.png" alt="Urest Logo" class="logo">
+            <div class="badge" id="version-badge">Version 1.0.0</div>
+            <h1>U<span>REST</span></h1>
+            <p class="tagline">Universal Restoration for the Modern Web</p>
+            <div class="btn-group">
+                <a href="https://addons.mozilla.org/en-GB/firefox/addon/urest-unblock-surgical/" class="btn btn-firefox">
+                    <svg viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M8.824 7.287c.008 0 .004 0 0 0zm-2.8-1.4c.006 0 .003 0 0 0zm16.754 2.161c-.505-1.215-1.53-2.528-2.333-2.943.654 1.283 1.033 2.57 1.177 3.53l.002.02c-1.314-3.278-3.544-4.6-5.366-7.477-.091-.147-.184-.292-.273-.446a3.545 3.545 0 01-.13-.24 2.118 2.118 0 01-.172-.46.03.03 0 00-.027-.03.038.038 0 00-.021 0l-.006.001a.037.037 0 00-.01.005L15.624 0c-2.585 1.515-3.657 4.168-3.932 5.856a6.197 6.197 0 00-2.305.587.297.297 0 00-.147.37c.057.162.24.24.396.17a5.622 5.622 0 012.008-.523l.067-.005a5.847 5.847 0 011.957.222l.095.03a5.816 5.816 0 01.616.228c.08.036.16.073.238.112l.107.055a5.835 5.835 0 01.368.211 5.953 5.953 0 012.034 2.104c-.62-.437-1.733-.868-2.803-.681 4.183 2.09 3.06 9.292-2.737 9.02a5.164 5.164 0 01-1.513-.292 4.42 4.42 0 01-.538-.232c-1.42-.735-2.593-2.121-2.74-3.806 0 0 .537-2 3.845-2 .357 0 1.38-.998 1.398-1.287-.005-.095-2.029-.9-2.817-1.677-.422-.416-.622-.616-.8-.767a3.47 3.47 0 00-.301-.227 5.388 5.388 0 01-.032-2.842c-1.195.544-2.124 1.403-2.8 2.163h-.006c-.46-.584-.428-2.51-.402-2.913-.006-.025-.343.176-.389.206-.406.29-.787.616-1.136.974-.397.403-.76.839-1.085 1.303a9.816 9.816 0 00-1.562 3.52c-.003.013-.11.487-.19 1.073-.013.09-.026.181-.037.272a7.8 7.8 0 00-.069.667l-.002.034-.023.387-.001.06C.386 18.795 5.593 24 12.016 24c5.752 0 10.527-4.176 11.463-9.661.02-.149.035-.298.052-.448.232-1.994-.025-4.09-.753-5.844z"/>
+                    </svg>
+                    Add to Firefox
+                </a>
+                <a href="https://microsoftedge.microsoft.com/addons/detail/urest-universal-restora/mnhpkflbfhioacjokncnahclmdfndcln" class="btn btn-edge">
+                    <svg viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M21.86 17.86q.14 0 .25.12.1.13.1.25t-.11.33l-.32.46-.43.53-.44.5q-.21.25-.38.42l-.22.23q-.58.53-1.34 1.04-.76.51-1.6.91-.86.4-1.74.64t-1.67.24q-.9 0-1.69-.28-.8-.28-1.48-.78-.68-.5-1.22-1.17-.53-.66-.92-1.44-.38-.77-.58-1.6-.2-.83-.2-1.67 0-1 .32-1.96.33-.97.87-1.8.14.95.55 1.77.41.82 1.02 1.5.6.68 1.38 1.21.78.54 1.64.9.86.36 1.77.56.92.2 1.8.2 1.12 0 2.18-.24 1.06-.23 2.06-.72l.2-.1.2-.05zm-15.5-1.27q0 1.1.27 2.15.27 1.06.78 2.03.51.96 1.24 1.77.74.82 1.66 1.4-1.47-.2-2.8-.74-1.33-.55-2.48-1.37-1.15-.83-2.08-1.9-.92-1.07-1.58-2.33T.36 14.94Q0 13.54 0 12.06q0-.81.32-1.49.31-.68.83-1.23.53-.55 1.2-.96.66-.4 1.35-.66.74-.27 1.5-.39.78-.12 1.55-.12.7 0 1.42.1.72.12 1.4.35.68.23 1.32.57.63.35 1.16.83-.35 0-.7.07-.33.07-.65.23v-.02q-.63.28-1.2.74-.57.46-1.05 1.04-.48.58-.87 1.26-.38.67-.65 1.39-.27.71-.42 1.44-.15.72-.15 1.38zM11.96.06q1.7 0 3.33.39 1.63.38 3.07 1.15 1.43.77 2.62 1.93 1.18 1.16 1.98 2.7.49.94.76 1.96.28 1 .28 2.08 0 .89-.23 1.7-.24.8-.69 1.48-.45.68-1.1 1.22-.64.53-1.45.88-.54.24-1.11.36-.58.13-1.16.13-.42 0-.97-.03-.54-.03-1.1-.12-.55-.1-1.05-.28-.5-.19-.84-.5-.12-.09-.23-.24-.1-.16-.1-.33 0-.15.16-.35.16-.2.35-.5.2-.28.36-.68.16-.4.16-.95 0-1.06-.4-1.96-.4-.91-1.06-1.64-.66-.74-1.52-1.28-.86-.55-1.79-.89-.84-.3-1.72-.44-.87-.14-1.76-.14-1.55 0-3.06.45T.94 7.55q.71-1.74 1.81-3.13 1.1-1.38 2.52-2.35Q6.68 1.1 8.37.58q1.7-.52 3.58-.52Z"/>
+                    </svg>
+                    Add to Edge
+                </a>
+            </div>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <span class="feature-icon">🛡️</span>
+                <h3>Surgical Precision</h3>
+                <p>Neutralizes scripts that block right-click and selection without breaking site functionality.</p>
+            </div>
+            <div class="card">
+                <span class="feature-icon">🧩</span>
+                <h3>Modern Web Native</h3>
+                <p>Full support for Shadow DOM editors like VS Code Web, Monaco, and Salesforce.</p>
+            </div>
+            <div class="card">
+                <span class="feature-icon">🔒</span>
+                <h3>Privacy First</h3>
+                <p>Zero tracking. No external requests. 100% local execution within your browser.</p>
+            </div>
+        </div>
+
+        <div style="margin: 8rem 0; text-align: center;">
+            <h2 style="font-size: 3rem; font-weight: 900; letter-spacing: -0.05em; margin-bottom: 1.5rem;">Experience Digital Freedom.</h2>
+            <p style="color: var(--muted); font-size: 1.2rem; max-width: 600px; margin: 0 auto 3rem;">Watch Urest in action surgically restoring the native browser experience on even the most restricted sites.</p>
+            <img src="demo.gif" alt="Urest Demo" style="width: 100%; border-radius: 32px; box-shadow: 0 30px 60px rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.05);">
+        </div>
+
+        <section id="support">
+            <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
+                <div class="card">
+                    <h3>Global Support</h3>
+                    <p style="color: var(--muted); margin-bottom: 2rem;">Need help or have suggestions? Connect with us directly.</p>
+                    <a href="mailto:helloaankda@gmail.com" style="color: var(--brand); text-decoration: none; font-weight: 700; font-size: 1.1rem;">helloaankda@gmail.com</a>
+                </div>
+                <div class="card">
+                    <h3>Privacy Portal</h3>
+                    <p style="color: var(--muted); margin-bottom: 2rem;">Zero data collection. Local-first architecture. Security as standard.</p>
+                    <a href="./privacy.html" style="color: var(--brand); text-decoration: none; font-weight: 700; font-size: 1.1rem;">View Privacy Policy →</a>
+                </div>
+            </div>
+        </section>
+
+        <footer style="margin-top: 6rem; padding: 4rem 0; border-top: 1px solid rgba(255,255,255,0.05); text-align: center; color: var(--muted); font-size: 0.9rem;">
+            <p>Copyright &copy; 2026 AANKDA LLC. Licensed under the Urest Proprietary Source-Available License.</p>
+        </footer>
+    </div>
+    <script>
+        // Dynamically fetch version from our public repo
+        fetch('https://raw.githubusercontent.com/aankda/urest/main/package.json')
+            .then(res => res.json())
+            .then(data => {
+                if (data.version) {
+                    document.getElementById('version-badge').textContent = `Version ${data.version}`;
+                }
+            })
+            .catch(() => {
+                // Fallback to static version if fetch fails
+                console.log('Using static version fallback');
+            });
+    </script>
+</body>
+</html>
