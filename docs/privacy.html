@@ -3,95 +3,265 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Privacy Policy | Urest</title>
+    <title>Privacy Policy | URest</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #030712;
-            --card: #111827;
-            --brand: #6366f1;
-            --neon: #818cf8;
-            --text: #f9fafb;
-            --muted: #9ca3af;
+            --font-sans: 'Geist', system-ui, sans-serif;
+            --font-serif: 'Instrument Serif', Georgia, serif;
+            --bg: #060810;
+            --bg-raised: #0c0f18;
+            --bg-card: #101420;
+            --tx-primary: #eef0f6;
+            --tx-secondary: #7a8099;
+            --tx-muted: #3a3f52;
+            --cyan: #0ea5c4;
+            --cyan-glow: rgba(14, 165, 196, 0.1);
+            --cyan-border: rgba(14, 165, 196, 0.18);
+            --border: rgba(238, 240, 246, 0.06);
+            --r-xl: 28px;
+            --ease: cubic-bezier(0.22, 1, 0.36, 1);
         }
+
         body {
             margin: 0;
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            line-height: 1.6;
+            background: var(--bg);
+            color: var(--tx-primary);
+            font-family: var(--font-sans);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
         }
-        .container { max-width: 800px; margin: 0 auto; padding: 4rem 2rem; }
-        .nav-back { margin-bottom: 2rem; }
-        .nav-back a { color: var(--brand); text-decoration: none; font-weight: 700; transition: color 0.3s; }
-        .nav-back a:hover { color: var(--neon); }
-        .hero { text-align: center; margin-bottom: 4rem; }
-        .logo { width: 80px; height: 80px; border-radius: 16px; margin-bottom: 1.5rem; box-shadow: 0 0 20px rgba(0, 242, 255, 0.2); }
-        h1 { font-size: 2.5rem; font-weight: 900; margin: 0; letter-spacing: -0.05em; }
-        h1 span { color: var(--neon); }
-        .last-updated { color: var(--muted); font-size: 0.9rem; margin-top: 0.5rem; }
-        .policy-grid { display: flex; flex-direction: column; gap: 1.5rem; margin-top: 3rem; }
-        .card { background: var(--card); padding: 2rem; border-radius: 24px; border: 1px solid rgba(255,255,255,0.05); }
-        .card h3 { color: var(--neon); margin-top: 0; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.1em; }
-        footer { margin-top: 6rem; padding: 4rem 0; border-top: 1px solid rgba(255,255,255,0.05); text-align: center; color: var(--muted); font-size: 0.9rem; }
-        .footer-note { margin-bottom: 1.5rem; max-width: 600px; margin-left: auto; margin-right: auto; }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3%3Cfilter id='noiseFilter'%3%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3%3C/filter%3%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3%3C/svg%3");
+            opacity: 0.04;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        .container { max-width: 800px; margin: 0 auto; padding: 0 2rem; position: relative; z-index: 10; }
+
+        header {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: 60px;
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        header .nav-inner {
+            width: 100%;
+            max-width: 800px;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+        .brand svg { color: var(--cyan); }
+        .brand span { font-weight: 600; font-size: 1.1rem; color: var(--tx-primary); }
+
+        .back-link { 
+            font-size: 0.85rem; 
+            text-decoration: none; 
+            color: var(--tx-secondary); 
+            display: flex; 
+            align-items: center; 
+            gap: 6px; 
+            transition: color 0.3s;
+        }
+        .back-link:hover { color: var(--cyan); }
+
+        .page-hero { padding: 12rem 0 6rem; text-align: center; }
+        .page-hero .icon { 
+            width: 48px; height: 48px; 
+            background: var(--cyan-glow); 
+            border: 1px solid var(--cyan-border); 
+            border-radius: 14px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            margin: 0 auto 2rem; 
+            color: var(--cyan);
+        }
+
+        h1 { font-family: var(--font-serif); font-size: 4rem; font-style: italic; margin: 0; letter-spacing: -0.02em; }
+        .dated { font-size: 0.8rem; color: var(--tx-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-top: 1rem; display: block; }
+
+        .intro { text-align: center; color: var(--tx-secondary); font-size: 1.1rem; max-width: 600px; margin: 2rem auto 6rem; line-height: 1.6; }
+
+        .policy-list {
+            background: var(--border);
+            border: 1px solid var(--border);
+            border-radius: var(--r-xl);
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+            overflow: hidden;
+            margin-bottom: 8rem;
+        }
+
+        .p-card { background: var(--bg-card); padding: 3rem; display: grid; grid-template-columns: 40px 1fr; gap: 2rem; }
+        .p-icon { color: var(--cyan); margin-top: 2px; }
+        .p-content h2 { font-size: 1.1rem; font-weight: 600; margin: 0 0 1rem; color: var(--tx-primary); }
+        .p-content p { color: var(--tx-secondary); margin: 0; line-height: 1.6; }
+
+        .contact-card {
+            background-color: color-mix(in srgb, var(--bg-card) 85%, rgba(14,165,196,0.08));
+        }
+
+        footer {
+            padding: 6rem 0;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--tx-secondary);
+            font-size: 0.9rem;
+        }
+        .f-right { display: flex; gap: 2rem; }
+        .f-right a { color: var(--tx-secondary); text-decoration: none; transition: color 0.3s; }
+        .f-right a:hover { color: var(--cyan); }
+
+        /* Reveal Animation */
+        .reveal { opacity: 0; transform: translateY(20px); transition: all 0.8s var(--ease); }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 3rem; }
+            .p-card { grid-template-columns: 1fr; gap: 1rem; }
+            footer { flex-direction: column; gap: 2rem; text-align: center; }
+            .f-right { flex-direction: column; gap: 1rem; }
+        }
     </style>
 </head>
 <body>
+    <header>
+        <div class="nav-inner">
+            <a href="./index.html" class="brand">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m12 8 4 4-4 4"/><path d="M8 12h8"/></svg>
+                <span>URest</span>
+            </a>
+            <a href="./index.html" class="back-link">← Back</a>
+        </div>
+    </header>
+
     <div class="container">
-        <div class="nav-back">
-            <a href="https://aankda.github.io/urest/">← Back to Urest</a>
+        <section class="page-hero reveal">
+            <div class="icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+            </div>
+            <h1>Privacy Policy</h1>
+            <span class="dated">Last updated: March 12, 2026</span>
+        </section>
+
+        <p class="intro reveal">URest is built on the principle of surgical independence. We believe your browser belongs to you, and your data should never leave your machine.</p>
+
+        <div class="policy-list reveal">
+            <div class="p-card">
+                <div class="p-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 11.08 11.14 22 2 12.86 5.45 9.5 11.14 15.14 22 4.29"/><polyline points="22 4.29 11.14 15.14 5.45 9.5"/></svg>
+                </div>
+                <div class="p-content">
+                    <h2>The Bottom Line</h2>
+                    <p>URest does not collect, store, or transmit any data about you or the websites you visit. Full stop.</p>
+                </div>
+            </div>
+
+            <div class="p-card">
+                <div class="p-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+                </div>
+                <div class="p-content">
+                    <h2>Data Collection</h2>
+                    <p>Nothing. URest operates entirely within your browser. No browsing history, no site data, no personal information, and no usage analytics are collected at any time.</p>
+                </div>
+            </div>
+
+            <div class="p-card">
+                <div class="p-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7h-9"/><path d="M14 17H5"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/></svg>
+                </div>
+                <div class="p-content">
+                    <h2>Your Settings</h2>
+                    <p>The only data Urest stores is your personal settings (enabled/disabled state and your Excluded Domains list). This data is stored exclusively in your browser's local extension storage API. It never leaves your device.</p>
+                </div>
+            </div>
+
+            <div class="p-card">
+                <div class="p-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h6v6"/><path d="M21 7 14 14l-4-4-7 7"/><path d="M10 21v-6h6"/></svg>
+                </div>
+                <div class="p-content">
+                    <h2>Third Parties</h2>
+                    <p>URest makes zero external network requests. There are no third-party analytics, no advertising SDKs, and no telemetry of any kind built into the extension.</p>
+                </div>
+            </div>
+
+            <div class="p-card">
+                <div class="p-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15.5 7.5 2.3 2.3a1 1 0 0 0 1.4 0l2.1-2.1a1 1 0 0 0 0-1.4L19 4a1 1 0 0 0-1.4 0l-2.1 2.1a1 1 0 0 0 0 1.4ZM7 21l-4-4 8-8 4 4-8 8ZM14 11l1-1M12 13l1-1M10 15l1-1M8 17l1-1"/></svg>
+                </div>
+                <div class="p-content">
+                    <h2>Permissions</h2>
+                    <p>URest requests only the "storage" permission, used solely to save your settings locally. No additional host permissions are requested.</p>
+                </div>
+            </div>
+
+            <div class="p-card">
+                <div class="p-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                </div>
+                <div class="p-content">
+                    <h2>Changes to This Policy</h2>
+                    <p>If this policy changes in a future version, the updated policy will be published at this URL with a revised date. We will never retroactively introduce data collection.</p>
+                </div>
+            </div>
+
+            <div class="p-card contact-card">
+                <div class="p-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                </div>
+                <div class="p-content">
+                    <h2>Contact</h2>
+                    <p>For any privacy-related questions: <a href="mailto:helloaankda@gmail.com" style="color: var(--cyan); text-decoration: none; font-weight: 600;">helloaankda@gmail.com</a></p>
+                </div>
+            </div>
         </div>
 
-        <div class="hero">
-            <img src="icon128.png" alt="Urest Logo" class="logo">
-            <h1>Privacy <span>Policy</span></h1>
-            <p class="last-updated">Last updated: March 12, 2026</p>
-        </div>
-
-        <div class="policy-grid">
-            <div class="card">
-                <h3>The Bottom Line</h3>
-                <p>URest does not collect, store, or transmit any data about you or the websites you visit. Full stop.</p>
+        <footer class="reveal">
+            <div class="f-left">
+                <a href="https://aankda.github.io/" style="text-decoration: none; font-weight: 600; color: var(--tx-primary);">AANKDA LLC</a>
             </div>
-
-            <div class="card">
-                <h3>Data Collection</h3>
-                <p>Nothing. URest operates entirely within your browser. No browsing history, no site data, no personal information, and no usage analytics are collected at any time.</p>
+            <div class="f-right">
+                <a href="./privacy.html">Privacy Policy</a>
+                <a href="https://github.com/aankda/urest">GitHub ↗</a>
+                <a href="https://aankda.github.io/">AANKDA ↗</a>
             </div>
-
-            <div class="card">
-                <h3>Your Settings</h3>
-                <p>The only data Urest stores is your personal settings (enabled/disabled state and your Excluded Domains list). This data is stored exclusively in your browser's local extension storage API. It never leaves your device.</p>
-            </div>
-
-            <div class="card">
-                <h3>Third Parties</h3>
-                <p>URest makes zero external network requests. There are no third-party analytics, no advertising SDKs, and no telemetry of any kind built into the extension.</p>
-            </div>
-
-            <div class="card">
-                <h3>Permissions</h3>
-                <p>URest requests only the "storage" permission, used solely to save your settings locally. No additional host permissions are requested.</p>
-            </div>
-
-            <div class="card">
-                <h3>Changes to This Policy</h3>
-                <p>If this policy changes in a future version, the updated policy will be published at this URL with a revised date. We will never retroactively introduce data collection.</p>
-            </div>
-
-            <div class="card">
-                <h3>Contact</h3>
-                <p>For any privacy-related questions: <a href="mailto:helloaankda@gmail.com" style="color: var(--brand); text-decoration: none;">helloaankda@gmail.com</a></p>
-            </div>
-        </div>
-
-        <footer>
-            <p class="footer-note">URest is committed to absolute privacy. The extension does not collect, store, or transmit any data from the websites you visit.</p>
-            <p>Copyright &copy; 2026 AANKDA LLC. Licensed under the Urest Proprietary Source-Available License.</p>
         </footer>
     </div>
+
+    <script>
+        // Scroll Reveal
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    </script>
 </body>
 </html>
