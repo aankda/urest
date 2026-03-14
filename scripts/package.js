@@ -17,7 +17,7 @@ const getVersion = () => {
 };
 
 const version = getVersion();
-const targets = ['firefox', 'edge'];
+const targets = ['chrome', 'firefox', 'edge'];
 
 console.log(`📦 Starting packaging for version ${version}...`);
 
@@ -28,7 +28,8 @@ targets.forEach(target => {
     return;
   }
 
-  const zipName = `Urest-${target === 'firefox' ? 'Firefox' : 'Edge'}-v${version}.zip`;
+  const getTargetName = (t) => t.charAt(0).toUpperCase() + t.slice(1);
+  const zipName = `Urest-${getTargetName(target)}-v${version}.zip`;
   const zipPath = path.join(packageDir, zipName);
 
   console.log(`🚀 Packaging ${target}...`);

@@ -14,9 +14,10 @@
   "scripts": {
     "dev": "vite",
     "build:core": "tsc && vite build --outDir dist/core",
+    "build:chrome": "npm run build:core && rm -rf dist/chrome && cp -r dist/core dist/chrome",
     "build:firefox": "npm run build:core && rm -rf dist/firefox && cp -r dist/core dist/firefox && node scripts/patch-firefox.js",
     "build:edge": "npm run build:core && rm -rf dist/edge && cp -r dist/core dist/edge",
-    "build": "npm run build:firefox && npm run build:edge",
+    "build": "npm run build:chrome && npm run build:firefox && npm run build:edge",
     "package": "npm run build && node scripts/package.js",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"

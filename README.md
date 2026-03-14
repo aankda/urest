@@ -7,6 +7,7 @@
 
   <p align="center">
     <a href="https://addons.mozilla.org/en-GB/firefox/addon/urest-unblock-surgical/"><img src="https://img.shields.io/badge/Firefox-E66000?style=for-the-badge&logo=firefox-browser&logoColor=white" alt="Install for Firefox"></a>
+    <a href="#"><img src="https://img.shields.io/badge/Google%20Chrome-4285F4?style=for-the-badge&logo=google-chrome&logoColor=white" alt="Install for Chrome"></a>
     <a href="https://microsoftedge.microsoft.com/addons/detail/urest-universal-restora/mnhpkflbfhioacjokncnahclmdfndcln"><img src="https://img.shields.io/badge/Microsoft%20Edge-0078D7?style=for-the-badge&logo=microsoft-edge&logoColor=white" alt="Install for Edge"></a>
   </p>
 

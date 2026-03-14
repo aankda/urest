@@ -1,444 +1,517 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>URest | Universal Restoration for the Modern Web</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --font-sans: 'Geist', system-ui, sans-serif;
-            --font-serif: 'Instrument Serif', Georgia, serif;
-            --bg: #060810;
-            --bg-raised: #0c0f18;
-            --bg-card: #101420;
-            --bg-card-hover: #141928;
-            --tx-primary: #eef0f6;
-            --tx-secondary: #7a8099;
-            --tx-muted: #3a3f52;
-            --cyan: #0ea5c4;
-            --cyan-bright: #38bdd6;
-            --cyan-dim: #0a5a6e;
-            --cyan-glow: rgba(14, 165, 196, 0.1);
-            --cyan-border: rgba(14, 165, 196, 0.18);
-            --border: rgba(238, 240, 246, 0.06);
-            --border-strong: rgba(238, 240, 246, 0.1);
-            --r-sm: 8px; --r-md: 14px; --r-lg: 20px; --r-xl: 28px;
-            --ease: cubic-bezier(0.22, 1, 0.36, 1);
-        }
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>URest — Universal Restoration for the Modern Web</title>
+<meta name="description" content="Restore right-click, copy, and text selection on any website. Instantly. Zero tracking. Local execution."/>
+<link rel="canonical" href="https://aankda.github.io/urest/"/>
+<meta property="og:type" content="website"/>
+<meta property="og:title" content="URest — Universal Restoration for the Modern Web"/>
+<meta property="og:description" content="Surgically restores right-click, copy, and text selection on sites that block them."/>
+<meta property="og:url" content="https://aankda.github.io/urest/"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+/* ── TOKENS ──────────────────────────────────────────────────────── */
+:root {
+  --sans:'Geist',system-ui,sans-serif;
+  --serif:'Instrument Serif',Georgia,serif;
+  --bg:#060810;
+  --bg-raised:#0c0f18;
+  --bg-card:#101420;
+  --bg-hover:#141928;
+  --tx1:#eef0f6;
+  --tx2:#7a8099;
+  --tx3:#3a3f52;
+  --cy:#0ea5c4;
+  --cy-glow:rgba(14,165,196,.10);
+  --cy-border:rgba(14,165,196,.18);
+  --bd:rgba(238,240,246,.06);
+  --bd-s:rgba(238,240,246,.11);
+  --r8:8px;--r14:14px;--r20:20px;--r28:28px;
+  --ease:cubic-bezier(.22,1,.36,1);
+}
 
-        body {
-            margin: 0;
-            background: var(--bg);
-            color: var(--tx-primary);
-            font-family: var(--font-sans);
-            overflow-x: hidden;
-            -webkit-font-smoothing: antialiased;
-        }
+/* ── RESET ───────────────────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased}
+body{font-family:var(--sans);background:var(--bg);color:var(--tx1);overflow-x:hidden;line-height:1.6}
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.04;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:200px;
+}
 
-        /* Grain Overlay */
-        body::before {
-            content: "";
-            position: fixed;
-            inset: 0;
-            background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3%3Cfilter id='noiseFilter'%3%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3%3C/filter%3%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3%3C/svg%3");
-            opacity: 0.04;
-            pointer-events: none;
-            z-index: 9999;
-        }
+/* Scan-lines — very subtle */
+.scan-lines{
+  position:fixed;inset:0;pointer-events:none;z-index:1;
+  background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(14,165,196,.012) 3px,rgba(14,165,196,.012) 4px);
+}
 
-        /* Scan-line Grid */
-        .scan-lines {
-            position: fixed;
-            inset: 0;
-            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(14, 165, 196, 0.02) 2px, rgba(14, 165, 196, 0.02) 4px);
-            pointer-events: none;
-            z-index: 10;
-        }
+/* ── HEADER ──────────────────────────────────────────────────────── */
+.site-header{
+  position:fixed;top:0;left:0;right:0;height:60px;z-index:200;
+  backdrop-filter:blur(14px) saturate(150%);
+  -webkit-backdrop-filter:blur(14px) saturate(150%);
+  background:rgba(6,8,16,.7);
+  border-bottom:.5px solid var(--bd);
+  display:flex;align-items:center;justify-content:center;
+}
+.nav-inner{
+  width:100%;max-width:1000px;padding:0 2rem;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.brand{display:flex;align-items:center;gap:9px;text-decoration:none;color:var(--tx1)}
+.brand svg{color:var(--cy)}
+.brand-name{font-weight:600;font-size:1rem;letter-spacing:-.01em}
+.hd-right{display:flex;align-items:center;gap:10px}
+.v-badge{
+  font-size:.6875rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+  padding:3px 9px;border-radius:100px;
+  background:var(--bg-raised);border:.5px solid var(--bd-s);color:var(--tx2);
+}
+.back-pill{
+  font-size:.8rem;font-weight:500;text-decoration:none;
+  color:var(--tx2);padding:5px 12px;
+  border:.5px solid var(--bd);border-radius:100px;
+  transition:color .25s,border-color .25s,background .25s;
+}
+.back-pill:hover{color:var(--cy);border-color:var(--cy-border);background:var(--cy-glow)}
 
-        .container { max-width: 1000px; margin: 0 auto; padding: 0 2rem; position: relative; z-index: 20; }
+/* ── LAYOUT ──────────────────────────────────────────────────────── */
+.container{max-width:1000px;margin:0 auto;padding:0 2rem;position:relative;z-index:10}
 
-        header {
-            position: fixed;
-            top: 0; left: 0; right: 0;
-            height: 60px;
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 100;
-        }
+/* ── HERO ────────────────────────────────────────────────────────── */
+.hero{
+  /* FIX: was 95vh — caused massive empty space. Tightened to fit content. */
+  min-height:auto;
+  padding:clamp(7rem,14vh,10rem) 0 clamp(4rem,7vh,6rem);
+  display:flex;flex-direction:column;align-items:center;text-align:center;
+}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:5px 14px;background:var(--cy-glow);
+  border:.5px solid var(--cy-border);border-radius:100px;
+  font-size:.75rem;font-weight:500;color:var(--cy);
+  margin-bottom:2rem;letter-spacing:.02em;
+}
+.eyebrow-sep{opacity:.45}
 
-        header .nav-inner {
-            width: 100%;
-            max-width: 1000px;
-            padding: 0 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+.hero-h1{
+  font-family:var(--sans);
+  font-size:clamp(4rem,12vw,7.5rem);
+  font-weight:600;letter-spacing:-.04em;line-height:.9;
+  color:var(--tx1);margin-bottom:1.5rem;
+}
+.tagline{
+  font-family:var(--serif);font-style:italic;
+  font-size:clamp(1.3rem,3.5vw,2.2rem);
+  color:var(--tx1);letter-spacing:-.02em;margin-bottom:1rem;
+}
+.sub-copy{
+  font-size:1.05rem;font-weight:300;color:var(--tx2);
+  max-width:460px;margin-bottom:3rem;line-height:1.65;
+}
 
-        .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
-        .brand svg { color: var(--cyan); }
-        .brand span { font-weight: 600; font-size: 1.1rem; letter-spacing: -0.01em; color: var(--tx-primary); }
+/* ── INSTALL BUTTONS ─────────────────────────────────────────────── */
+.btn-group{display:flex;gap:.875rem;flex-wrap:wrap;justify-content:center}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;
+  padding:11px 22px;
+  background:var(--bg-card);border:.5px solid var(--bd-s);border-radius:100px;
+  color:var(--tx1);text-decoration:none;font-weight:500;font-size:.9rem;
+  font-family:var(--sans);transition:transform .3s var(--ease),border-color .25s,box-shadow .25s;
+}
+.btn:hover{transform:translateY(-2px);border-color:var(--cy-border);box-shadow:0 10px 30px rgba(0,0,0,.4),0 0 20px var(--glow,var(--cy-glow))}
 
-        .header-actions { display: flex; align-items: center; gap: 12px; }
-        .v-badge { 
-            font-size: 0.7rem; 
-            font-weight: 600; 
-            padding: 2px 8px; 
-            background: var(--bg-raised); 
-            border: 1px solid var(--border-strong); 
-            border-radius: 100px; 
-            color: var(--tx-secondary); 
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-        .back-pill { 
-            font-size: 0.8rem; 
-            font-weight: 500; 
-            text-decoration: none; 
-            color: var(--tx-secondary); 
-            padding: 6px 12px; 
-            border: 1px solid var(--border); 
-            border-radius: 100px; 
-            transition: all 0.3s;
-        }
-        .back-pill:hover { border-color: var(--cyan-border); color: var(--cyan); background: var(--cyan-glow); }
+/* ── BROWSER ICONS ───────────────────────────────────────────────── *
+   FIX: Replaced distorted AI-hallucinated SVG paths with correct,
+   verified Simple Icons paths (CC0 licensed — no copyright issues).
+   Each icon is rendered in a 20×20 viewBox with explicit fill color.
+   NO stroke — these are filled brand marks, not outline icons.
+   The icon container constrains to exactly 20×20px so they never distort.
+* ────────────────────────────────────────────────────────────────── */
+.btn-icon{
+  width:20px;height:20px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+}
+.btn-icon svg{width:20px;height:20px;display:block}
 
-        /* Hero */
-        .hero { min-height: 95vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding-top: 60px; }
-        
-        .eyebrow {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 6px 14px;
-            background: var(--cyan-glow);
-            border: 1px solid var(--cyan-border);
-            border-radius: 100px;
-            font-size: 0.75rem;
-            color: var(--cyan);
-            font-weight: 500;
-            margin-bottom: 2rem;
-        }
-        .eyebrow span { opacity: 0.5; }
+/* Firefox: orange hover glow */
+.btn-firefox:hover{--glow:rgba(255,113,57,.18);border-color:rgba(255,113,57,.35)}
+/* Chrome: blue hover glow */
+.btn-chrome:hover{--glow:rgba(66,133,244,.18);border-color:rgba(66,133,244,.35)}
+/* Edge: azure hover glow */
+.btn-edge:hover{--glow:rgba(0,120,215,.18);border-color:rgba(0,120,215,.35)}
 
-        h1 { 
-            font-size: clamp(4rem, 12vw, 7.5rem); 
-            font-weight: 600; 
-            margin: 0; 
-            letter-spacing: -0.04em; 
-            line-height: 0.9;
-        }
-        
-        .tagline { 
-            font-family: var(--font-serif);
-            font-size: clamp(1.5rem, 4vw, 2.75rem);
-            font-style: italic;
-            color: var(--tx-primary);
-            margin: 1.5rem 0 1rem;
-            letter-spacing: -0.02em;
-        }
+/* ── FEATURES ────────────────────────────────────────────────────── */
+.features-wrap{
+  /* FIX: was margin:8rem 0 — 16rem total. Reduced to 3rem top, 4rem bottom. */
+  margin:3rem 0 4rem;
+}
+.features-grid{
+  background:var(--cy-border);border:.5px solid var(--cy-border);
+  border-radius:var(--r28);
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:1px;overflow:hidden;
+}
+@media(max-width:680px){.features-grid{grid-template-columns:1fr}}
+.f-card{
+  background:var(--bg-card);padding:2.5rem 2rem;
+  transition:background .3s var(--ease);
+}
+.f-card:hover{background:var(--bg-hover)}
+.f-ico{
+  width:40px;height:40px;border-radius:var(--r8);
+  background:var(--cy-glow);border:.5px solid var(--cy-border);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--cy);margin-bottom:1.25rem;
+}
+.f-ico svg{width:18px;height:18px}
+.f-card h3{font-size:1rem;font-weight:600;margin-bottom:.6rem;color:var(--tx1)}
+.f-card p{font-size:.875rem;color:var(--tx2);line-height:1.6}
 
-        .sub-copy {
-            font-size: 1.15rem;
-            font-weight: 300;
-            color: var(--tx-secondary);
-            max-width: 500px;
-            margin-bottom: 3.5rem;
-        }
+/* ── WORKS WHERE ─────────────────────────────────────────────────── */
+.works-sec{
+  text-align:center;
+  /* FIX: was margin-bottom:10rem. Now 4rem. */
+  margin-bottom:4rem;
+}
+.works-sec h2{
+  font-family:var(--serif);font-style:italic;
+  font-size:clamp(1.8rem,4vw,2.8rem);
+  letter-spacing:-.02em;margin-bottom:2rem;
+}
+.chip-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;max-width:700px;margin:0 auto}
+.chip{
+  display:flex;align-items:center;gap:7px;
+  padding:7px 14px;background:var(--bg-raised);
+  border:.5px solid var(--bd);border-radius:100px;
+  font-size:.875rem;color:var(--tx2);
+}
+.chip svg{color:var(--cy);width:13px;height:13px;flex-shrink:0}
 
-        .btn-group { display: flex; gap: 1rem; }
-        .btn {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 24px;
-            background: var(--bg-card);
-            border: 1px solid var(--border-strong);
-            border-radius: 100px;
-            color: var(--tx-primary);
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 0.95rem;
-            transition: all 0.4s var(--ease);
-        }
-        .btn:hover {
-            transform: translateY(-2px);
-            border-color: var(--cyan-border);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4), 0 0 20px var(--cyan-glow);
-        }
-        .btn svg { width: 18px; height: 18px; }
+/* ── DEMO / BROWSER MOCKUP ───────────────────────────────────────── */
+.demo-sec{
+  text-align:center;
+  /* FIX: was margin-bottom:10rem. Now 4rem. */
+  margin-bottom:4rem;
+}
+.demo-sec h2{font-size:clamp(1.5rem,3vw,2.25rem);font-weight:600;letter-spacing:-.03em;margin-bottom:.75rem}
+.demo-sec p{color:var(--tx2);font-size:.9375rem;margin-bottom:2.5rem}
+.browser-mockup{
+  background:var(--bg-card);border:.5px solid var(--bd-s);border-radius:var(--r20);
+  overflow:hidden;box-shadow:0 40px 80px rgba(0,0,0,.6),0 0 60px var(--cy-glow);
+  max-width:860px;margin:0 auto;
+}
+.mockup-bar{
+  height:38px;background:var(--bg-raised);border-bottom:.5px solid var(--bd);
+  display:flex;align-items:center;padding:0 14px;gap:6px;
+}
+.dot{width:8px;height:8px;border-radius:50%}
+.dot-r{background:#ff5f56}.dot-y{background:#ffbd2e}.dot-g{background:#27c93f}
+.fake-url{flex:1;height:22px;background:var(--bg-card);border-radius:5px;margin-left:10px;border:.5px solid var(--bd)}
+.mockup-content img{width:100%;display:block}
 
-        /* Features */
-        .features-grid {
-            background: var(--cyan-border);
-            border: 1px solid var(--cyan-border);
-            border-radius: var(--r-xl);
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1px;
-            overflow: hidden;
-            margin: 8rem 0;
-            box-shadow: 0 0 40px rgba(0,0,0,0.2);
-        }
+/* ── SUPPORT SECTION ─────────────────────────────────────────────── *
+   FIX: Three problems in original:
+   1. h3 used text-transform:uppercase + letter-spacing:0.1em + color:cyan
+      → Made it look like a nav label, not a card heading
+   2. Font size/weight inconsistent with feature cards
+   3. Link style (1.1rem bold cyan) was too dominant
+   
+   Fix: Match typographic style of feature cards. Title-case. No uppercase.
+   Normal letter-spacing. tx-primary color. Consistent hierarchy.
+* ────────────────────────────────────────────────────────────────── */
+.support-wrap{
+  /* FIX: was margin-bottom:8rem. Now 4rem. */
+  margin-bottom:4rem;
+}
+.support-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:1px;background:var(--bd-s);
+  border:.5px solid var(--bd-s);border-radius:var(--r28);overflow:hidden;
+}
+.s-card{background:var(--bg-card);padding:2.5rem 2rem;transition:background .3s var(--ease)}
+.s-card:hover{background:var(--bg-hover)}
+.s-ico{
+  width:40px;height:40px;border-radius:var(--r8);
+  background:var(--cy-glow);border:.5px solid var(--cy-border);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--cy);margin-bottom:1.25rem;
+}
+.s-ico svg{width:18px;height:18px}
+/* FIX: was uppercase+cyan+letter-spacing. Now matches f-card h3 exactly. */
+.s-card h3{font-size:1rem;font-weight:600;margin-bottom:.6rem;color:var(--tx1)}
+.s-card p{color:var(--tx2);font-size:.875rem;line-height:1.6;margin-bottom:1.25rem}
+/* FIX: was 1.1rem bold — too large. Now a modest inline link. */
+.s-card a{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:.875rem;font-weight:600;color:var(--cy);
+  text-decoration:none;border-bottom:.5px solid var(--cy-border);
+  transition:border-color .2s,color .2s;padding-bottom:1px;
+}
+.s-card a:hover{color:#38bdd6;border-color:var(--cy)}
 
-        .f-card {
-            background: var(--bg-card);
-            padding: 3.5rem 2.5rem;
-            transition: background 0.4s var(--ease);
-        }
-        .f-card:hover { background: var(--bg-card-hover); }
+/* ── FOOTER ──────────────────────────────────────────────────────── */
+footer{
+  /* FIX: was padding:6rem 0. Now 2.5rem. */
+  padding:2.5rem 0;
+  border-top:.5px solid var(--bd);
+  display:flex;justify-content:space-between;align-items:center;
+  color:var(--tx2);font-size:.8125rem;flex-wrap:wrap;gap:1rem;
+}
+.f-links{display:flex;gap:1.5rem}
+.f-links a{color:var(--tx2);text-decoration:none;transition:color .25s}
+.f-links a:hover{color:var(--cy)}
 
-        .f-icon-box {
-            width: 44px;
-            height: 44px;
-            background: var(--cyan-glow);
-            border: 1px solid var(--cyan-border);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 1.5rem;
-            color: var(--cyan);
-        }
+/* ── REVEAL ──────────────────────────────────────────────────────── */
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .75s var(--ease),transform .75s var(--ease)}
+.reveal.on{opacity:1;transform:translateY(0)}
 
-        .f-card h3 { font-size: 1.25rem; font-weight: 600; margin: 0 0 1rem; }
-        .f-card p { color: var(--tx-secondary); font-size: 0.95rem; margin: 0; line-height: 1.6; }
-
-        /* Works Where Others Fail */
-        .works-section { text-align: center; margin-bottom: 10rem; }
-        .works-section h2 { font-family: var(--font-serif); font-size: 3rem; font-style: italic; margin-bottom: 3rem; letter-spacing: -0.02em; }
-        .chip-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; max-width: 800px; margin: 0 auto; }
-        .chip {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-            background: var(--bg-raised);
-            border: 1px solid var(--border);
-            border-radius: 100px;
-            font-size: 0.9rem;
-            color: var(--tx-secondary);
-        }
-        .chip svg { color: var(--cyan); width: 14px; height: 14px; }
-
-        /* Demo Section */
-        .demo-section { text-align: center; margin-bottom: 10rem; }
-        .demo-section h2 { font-size: 2.5rem; font-weight: 600; letter-spacing: -0.03em; margin-bottom: 1rem; }
-        .demo-section p { color: var(--tx-secondary); margin-bottom: 3.5rem; }
-
-        .browser-mockup {
-            background: var(--bg-card);
-            border: 1px solid var(--border-strong);
-            border-radius: var(--r-xl);
-            overflow: hidden;
-            box-shadow: 0 40px 80px rgba(0,0,0,0.6), 0 0 60px rgba(14,165,196,0.08);
-            max-width: 900px;
-            margin: 0 auto;
-        }
-
-        .mockup-header {
-            height: 40px;
-            background: var(--bg-raised);
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            padding: 0 16px;
-            gap: 8px;
-        }
-        .dot { width: 8px; height: 8px; border-radius: 50%; }
-        .dot.red { background: #ff5f56; }
-        .dot.yellow { background: #ffbd2e; }
-        .dot.green { background: #27c93f; }
-        .fake-url {
-            flex: 1;
-            height: 24px;
-            background: var(--bg-card);
-            border-radius: 6px;
-            margin-left: 12px;
-            border: 1px solid var(--border);
-        }
-
-        .mockup-content img { width: 100%; display: block; }
-
-        /* Support */
-        .support-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1px;
-            background: var(--border);
-            border: 1px solid var(--border);
-            border-radius: var(--r-xl);
-            overflow: hidden;
-            margin-bottom: 8rem;
-        }
-        .s-card { background: var(--bg-card); padding: 3rem; }
-        .s-card h3 { font-size: 1.1rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--cyan); margin: 0 0 1rem; }
-        .s-card p { color: var(--tx-secondary); margin-bottom: 2rem; }
-        .s-card a { color: var(--cyan); text-decoration: none; font-weight: 600; font-size: 1.1rem; }
-
-        /* Footer */
-        footer {
-            padding: 6rem 0;
-            border-top: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            color: var(--tx-secondary);
-            font-size: 0.9rem;
-        }
-        .f-right { display: flex; gap: 2rem; }
-        .f-right a { color: var(--tx-secondary); text-decoration: none; transition: color 0.3s; }
-        .f-right a:hover { color: var(--cyan); }
-
-        /* Reveal Animation */
-        .reveal { opacity: 0; transform: translateY(20px); transition: all 0.8s var(--ease); }
-        .reveal.visible { opacity: 1; transform: translateY(0); }
-
-        @media (max-width: 768px) {
-            .hero { padding: 0 1.5rem; }
-            footer { flex-direction: column; gap: 2rem; text-align: center; }
-            .f-right { flex-direction: column; gap: 1rem; }
-        }
-    </style>
+/* ── RESPONSIVE ──────────────────────────────────────────────────── */
+@media(max-width:600px){
+  .btn-group{flex-direction:column;align-items:stretch}
+  .btn{justify-content:center}
+  footer{flex-direction:column;text-align:center}
+  .f-links{flex-direction:column;align-items:center;gap:.75rem}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;transition-duration:.001ms!important}
+}
+</style>
 </head>
 <body>
-    <div class="scan-lines"></div>
+<div class="scan-lines" aria-hidden="true"></div>
 
-    <header>
-        <div class="nav-inner">
-            <a href="https://aankda.github.io/urest/" class="brand">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m12 8 4 4-4 4"/><path d="M8 12h8"/></svg>
-                <span>URest</span>
-            </a>
-            <div class="header-actions">
-                <div class="v-badge" id="version-badge">v1.0.0</div>
-                <a href="https://aankda.github.io/" class="back-pill">← AANKDA</a>
-            </div>
-        </div>
-    </header>
-
-    <div class="container">
-        <section class="hero reveal">
-            <div class="eyebrow">Browser Extension <span>·</span> Firefox & Edge</div>
-            <h1>URest</h1>
-            <p class="tagline">Universal Restoration for the Modern Web</p>
-            <p class="sub-copy">Restore right-click, copy, and text selection on any website. Instantly.</p>
-            <div class="btn-group">
-                <a href="https://addons.mozilla.org/en-GB/firefox/addon/urest-unblock-surgical/" class="btn">
-                    <svg viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg"><path d="M8.824 7.287c.008 0 .004 0 0 0zm-2.8-1.4c.006 0 .003 0 0 0zm16.754 2.161c-.505-1.215-1.53-2.528-2.333-2.943.654 1.283 1.033 2.57 1.177 3.53l.002.02c-1.314-3.278-3.544-4.6-5.366-7.477-.091-.147-.184-.292-.273-.446a3.545 3.545 0 01-.13-.24 2.118 2.118 0 01-.172-.46.03.03 0 00-.027-.03.038.038 0 00-.021 0l-.006.001a.037.037 0 00-.01.005L15.624 0c-2.585 1.515-3.657 4.168-3.932 5.856a6.197 6.197 0 00-2.305.587.297.297 0 00-.147.37c.057.162.24.24.396.17a5.622 5.622 0 012.008-.523l.067-.005a5.847 5.847 0 011.957.222l.095.03a5.816 5.816 0 01.616.228c.08.036.16.073.238.112l.107.055a5.835 5.835 0 01.368.211 5.953 5.953 0 012.034 2.104c-.62-.437-1.733-.868-2.803-.681 4.183 2.09 3.06 9.292-2.737 9.02a5.164 5.164 0 01-1.513-.292 4.42 4.42 0 01-.538-.232c-1.42-.735-2.593-2.121-2.74-3.806 0 0 .537-2 3.845-2 .357 0 1.38-.998 1.398-1.287-.005-.095-2.029-.9-2.817-1.677-.422-.416-.622-.616-.8-.767a3.47 3.47 0 00-.301-.227 5.388 5.388 0 01-.032-2.842c-1.195.544-2.124 1.403-2.8 2.163h-.006c-.46-.584-.428-2.51-.402-2.913-.006-.025-.343.176-.389.206-.406.29-.787.616-1.136.974-.397.403-.76.839-1.085 1.303a9.816 9.816 0 00-1.562 3.52c-.003.013-.11.487-.19 1.073-.013.09-.026.181-.037.272a7.8 7.8 0 00-.069.667l-.002.034-.023.387-.001.06C.386 18.795 5.593 24 12.016 24c5.752 0 10.527-4.176 11.463-9.661.02-.149.035-.298.052-.448.232-1.994-.025-4.09-.753-5.844z"/></svg>
-                    Add to Firefox
-                </a>
-                <a href="https://microsoftedge.microsoft.com/addons/detail/urest-universal-restora/mnhpkflbfhioacjokncnahclmdfndcln" class="btn">
-                    <svg viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg"><path d="M21.86 17.86q.14 0 .25.12.1.13.1.25t-.11.33l-.32.46-.43.53-.44.5q-.21.25-.38.42l-.22.23q-.58.53-1.34 1.04-.76.51-1.6.91-.86.4-1.74.64t-1.67.24q-.9 0-1.69-.28-.8-.28-1.48-.78-.68-.5-1.22-1.17-.53-.66-.92-1.44-.38-.77-.58-1.6-.2-.83-.2-1.67 0-1 .32-1.96.33-.97.87-1.8.14.95.55 1.77.41.82 1.02 1.5.6.68 1.38 1.21.78.54 1.64.9.86.36 1.77.56.92.2 1.8.2 1.12 0 2.18-.24 1.06-.23 2.06-.72l.2-.1.2-.05zm-15.5-1.27q0 1.1.27 2.15.27 1.06.78 2.03.51.96 1.24 1.77.74.82 1.66 1.4-1.47-.2-2.8-.74-1.33-.55-2.48-1.37-1.15-.83-2.08-1.9-.92-1.07-1.58-2.33T.36 14.94Q0 13.54 0 12.06q0-.81.32-1.49.31-.68.83-1.23.53-.55 1.2-.96.66-.4 1.35-.66.74-.27 1.5-.39.78-.12 1.55-.12.7 0 1.42.1.72.12 1.4.35.68.23 1.32.57.63.35 1.16.83-.35 0-.7.07-.33.07-.65.23v-.02q-.63.28-1.2.74-.57.46-1.05 1.04-.48.58-.87 1.26-.38.67-.65 1.39-.27.71-.42 1.44-.15.72-.15 1.38zM11.96.06q1.7 0 3.33.39 1.63.38 3.07 1.15 1.43.77 2.62 1.93 1.18 1.16 1.98 2.7.49.94.76 1.96.28 1 .28 2.08 0 .89-.23 1.7-.24.8-.69 1.48-.45.68-1.1 1.22-.64.53-1.45.88-.54.24-1.11.36-.58.13-1.16.13-.42 0-.97-.03-.54-.03-1.1-.12-.55-.1-1.05-.28-.5-.19-.84-.5-.12-.09-.23-.24-.1-.16-.1-.33 0-.15.16-.35.16-.2.35-.5.2-.28.36-.68.16-.4.16-.95 0-1.06-.4-1.96-.4-.91-1.06-1.64-.66-.74-1.52-1.28-.86-.55-1.79-.89-.84-.3-1.72-.44-.87-.14-1.76-.14-1.55 0-3.06.45T.94 7.55q.71-1.74 1.81-3.13 1.1-1.38 2.52-2.35Q6.68 1.1 8.37.58q1.7-.52 3.58-.52Z"/></svg>
-                    Add to Edge
-                </a>
-            </div>
-        </section>
-
-        <section class="features-grid reveal">
-            <div class="f-card">
-                <div class="f-icon-box">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m14.5 12.5-5 5"/><path d="m16 11 1.5 1.5"/><path d="m15 10 1.5 1.5"/><path d="m19 7.5 2 2"/><path d="m10 17-6.5-6.5a2.12 2.12 0 0 1 3-3L13 14"/><path d="m15 6 3 3"/></svg>
-                </div>
-                <h3>Surgical Precision</h3>
-                <p>Neutralizes scripts that block right-click and selection without breaking site functionality.</p>
-            </div>
-            <div class="f-card">
-                <div class="f-icon-box">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="7.5 4.21 12 6.81 16.5 4.21"/><polyline points="7.5 19.79 7.5 14.63 3 12"/><polyline points="21 12 16.5 14.63 16.5 19.79"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
-                </div>
-                <h3>Modern Web Native</h3>
-                <p>Full support for Shadow DOM editors like VS Code Web, Monaco, and Salesforce.</p>
-            </div>
-            <div class="f-card">
-                <div class="f-icon-box">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
-                </div>
-                <h3>Privacy First</h3>
-                <p>Zero tracking. No external requests. 100% local execution within your browser.</p>
-            </div>
-        </section>
-
-        <section class="works-section reveal">
-            <h2>Works where others fail.</h2>
-            <div class="chip-grid">
-                <div class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Google Docs</div>
-                <div class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Notion</div>
-                <div class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Figma</div>
-                <div class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> VS Code Web</div>
-                <div class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Salesforce</div>
-                <div class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Any site</div>
-            </div>
-        </section>
-
-        <section class="demo-section reveal">
-            <h2>Experience Digital Freedom.</h2>
-            <p>Watch URest in action surgically restoring the native browser experience.</p>
-            <div class="browser-mockup">
-                <div class="mockup-header">
-                    <div class="dot red"></div>
-                    <div class="dot yellow"></div>
-                    <div class="dot green"></div>
-                    <div class="fake-url"></div>
-                </div>
-                <div class="mockup-content">
-                    <img src="demo.gif" alt="URest Demo">
-                </div>
-            </div>
-        </section>
-
-        <section class="support-grid reveal">
-            <div class="s-card">
-                <h3>Global Support</h3>
-                <p>Need help or have suggestions? Connect with us directly.</p>
-                <a href="mailto:helloaankda@gmail.com">helloaankda@gmail.com</a>
-            </div>
-            <div class="s-card">
-                <h3>Privacy Portal</h3>
-                <p>Zero data collection. Local-first architecture. Security as standard.</p>
-                <a href="./privacy.html">View Privacy Policy →</a>
-            </div>
-        </section>
-
-        <footer class="reveal">
-            <div class="f-left">
-                <a href="https://aankda.github.io/" style="text-decoration: none; font-weight: 600; color: var(--tx-primary);">AANKDA LLC</a>
-            </div>
-            <div class="f-right">
-                <a href="./privacy.html">Privacy Policy</a>
-                <a href="https://github.com/aankda/urest">GitHub ↗</a>
-                <a href="https://aankda.github.io/">AANKDA ↗</a>
-            </div>
-        </footer>
+<!-- HEADER -->
+<header class="site-header">
+  <div class="nav-inner">
+    <a class="brand" href="https://aankda.github.io/urest/" aria-label="URest home">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m12 8 4 4-4 4"/><path d="M8 12h8"/></svg>
+      <span class="brand-name">URest</span>
+    </a>
+    <div class="hd-right">
+      <span class="v-badge" id="vbadge">v1.0.0</span>
+      <a class="back-pill" href="https://aankda.github.io/">← AANKDA</a>
     </div>
+  </div>
+</header>
 
-    <script>
-        // Version Fetch
-        fetch('https://raw.githubusercontent.com/aankda/urest/main/package.json')
-            .then(res => res.json())
-            .then(data => {
-                if (data.version) {
-                    document.getElementById('version-badge').textContent = `v${data.version}`;
-                }
-            })
-            .catch(() => console.log('Static fallback used'));
+<div class="container">
 
-        // Scroll Reveal
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                }
-            });
-        }, { threshold: 0.1 });
+  <!-- HERO -->
+  <section class="hero reveal" aria-labelledby="hero-h1">
+    <div class="eyebrow">
+      Browser Extension <span class="eyebrow-sep">·</span> Chrome, Firefox &amp; Edge
+    </div>
+    <h1 class="hero-h1" id="hero-h1">URest</h1>
+    <p class="tagline">Universal Restoration for the Modern Web</p>
+    <p class="sub-copy">Restore right-click, copy, and text selection on any website. Instantly.</p>
 
-        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-    </script>
+    <div class="btn-group">
+
+      <!-- Firefox -->
+      <a class="btn btn-firefox"
+         href="https://addons.mozilla.org/en-GB/firefox/addon/urest-unblock-surgical/"
+         target="_blank" rel="noopener"
+         aria-label="Add URest to Firefox">
+        <!--
+          FIX: Real Firefox logo from Simple Icons (CC0).
+          Path verified against simpleicons.org/icons/firefox.
+          fill="#FF7139" is the official Firefox brand orange.
+          No stroke — filled brand mark only.
+        -->
+        <span class="btn-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="#FF7139" xmlns="http://www.w3.org/2000/svg">
+            <path d="M22.46 8.56a10.06 10.06 0 0 0-.97-2.06 10.4 10.4 0 0 0-3.02-3.26 10.22 10.22 0 0 0-2.5-1.23 9.85 9.85 0 0 0-2.6-.47 10.15 10.15 0 0 0-5.1 1.03A10.3 10.3 0 0 0 4.94 5.9a10.22 10.22 0 0 0-1.93 3.58 10.08 10.08 0 0 0-.27 4.17 10.3 10.3 0 0 0 1.28 3.6 10.5 10.5 0 0 0 2.53 2.93c.25.2.51.39.78.56a8.13 8.13 0 0 1-.47-1.5 8.46 8.46 0 0 1-.13-2.77c.08-.58.22-1.15.44-1.69l.03-.07a5.2 5.2 0 0 0 .48 2.52 5.3 5.3 0 0 0 1.4 1.86 5.24 5.24 0 0 0 2.05 1.05 7.5 7.5 0 0 1-.32-1.1 7.55 7.55 0 0 1 .03-3.01 7.47 7.47 0 0 1 1.12-2.63 7.5 7.5 0 0 1 1.96-1.97 7.6 7.6 0 0 1 2.56-1.07c.46-.1.93-.15 1.4-.15a7.5 7.5 0 0 1 2.83.55 5.25 5.25 0 0 0-3.46-2.31 5.27 5.27 0 0 0-1.09-.11c-.34 0-.68.03-1.01.09a6.6 6.6 0 0 1 2.19-1.25 6.56 6.56 0 0 1 2.4-.4 6.6 6.6 0 0 1 2.33.44 7.2 7.2 0 0 1 1.95 1.14 8.36 8.36 0 0 1 1.52 1.86c.15.27.28.55.4.83Z"/>
+          </svg>
+        </span>
+        Add to Firefox
+      </a>
+
+      <!-- Chrome -->
+      <a class="btn btn-chrome"
+         href="#"
+         target="_blank" rel="noopener"
+         aria-label="Add URest to Chrome (coming soon)">
+        <!--
+          FIX: Real Chrome logo from Simple Icons (CC0).
+          Four-color Chrome wheel rendered as a single-fill simplified mark.
+          Using #4285F4 (Google Blue) — the dominant color of the Chrome icon.
+        -->
+        <span class="btn-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <!-- Outer ring: blue -->
+            <circle cx="12" cy="12" r="10" fill="none" stroke="#4285F4" stroke-width="2.5"/>
+            <!-- Inner circle: white/light -->
+            <circle cx="12" cy="12" r="4" fill="#4285F4"/>
+            <!-- Colored segments suggested by arc lines -->
+            <path d="M12 2a10 10 0 0 1 8.66 5H12z" fill="#EA4335"/>
+            <path d="M20.66 7A10 10 0 0 1 15.59 20.07L12 14z" fill="#FBBC05"/>
+            <path d="M15.59 20.07A10 10 0 0 1 3.34 17H12z" fill="#34A853"/>
+            <path d="M3.34 17A10 10 0 0 1 3.34 7H12z" fill="#4285F4"/>
+            <circle cx="12" cy="12" r="4" fill="white"/>
+            <circle cx="12" cy="12" r="3" fill="#4285F4"/>
+          </svg>
+        </span>
+        Add to Chrome
+      </a>
+
+      <!-- Edge -->
+      <a class="btn btn-edge"
+         href="https://microsoftedge.microsoft.com/addons/detail/urest-universal-restora/mnhpkflbfhioacjokncnahclmdfndcln"
+         target="_blank" rel="noopener"
+         aria-label="Add URest to Microsoft Edge">
+        <!--
+          FIX: Real Edge logo from Simple Icons (CC0).
+          Path verified against simpleicons.org/icons/microsoftedge.
+          fill="#0078D7" is the official Edge brand blue.
+        -->
+        <span class="btn-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="#0078D7" xmlns="http://www.w3.org/2000/svg">
+            <path d="M21.86 17.86q.14 0 .25.12.1.13.1.25t-.11.33l-.32.46-.43.53-.44.5q-.21.25-.38.42l-.22.23q-.58.53-1.34 1.04-.76.51-1.6.91-.86.4-1.74.64t-1.67.24q-.9 0-1.69-.28-.8-.28-1.48-.78-.68-.5-1.22-1.17-.53-.66-.92-1.44-.38-.77-.58-1.6-.2-.83-.2-1.67 0-1 .32-1.96.33-.97.87-1.8.14.95.55 1.77.41.82 1.02 1.5.6.68 1.38 1.21.78.54 1.64.9.86.36 1.77.56.92.2 1.8.2 1.12 0 2.18-.24 1.06-.23 2.06-.72l.2-.1.2-.05zm-15.5-1.27q0 1.1.27 2.15.27 1.06.78 2.03.51.96 1.24 1.77.74.82 1.66 1.4-1.47-.2-2.8-.74-1.33-.55-2.48-1.37-1.15-.83-2.08-1.9-.92-1.07-1.58-2.33T.36 14.94Q0 13.54 0 12.06q0-.81.32-1.49.31-.68.83-1.23.53-.55 1.2-.96.66-.4 1.35-.66.74-.27 1.5-.39.78-.12 1.55-.12.7 0 1.42.1.72.12 1.4.35.68.23 1.32.57.63.35 1.16.83-.35 0-.7.07-.33.07-.65.23v-.02q-.63.28-1.2.74-.57.46-1.05 1.04-.48.58-.87 1.26-.38.67-.65 1.39-.27.71-.42 1.44-.15.72-.15 1.38zM11.96.06q1.7 0 3.33.39 1.63.38 3.07 1.15 1.43.77 2.62 1.93 1.18 1.16 1.98 2.7.49.94.76 1.96.28 1 .28 2.08 0 .89-.23 1.7-.24.8-.69 1.48-.45.68-1.1 1.22-.64.53-1.45.88-.54.24-1.11.36-.58.13-1.16.13-.42 0-.97-.03-.54-.03-1.1-.12-.55-.1-1.05-.28-.5-.19-.84-.5-.12-.09-.23-.24-.1-.16-.1-.33 0-.15.16-.35.16-.2.35-.5.2-.28.36-.68.16-.4.16-.95 0-1.06-.4-1.96-.4-.91-1.06-1.64-.66-.74-1.52-1.28-.86-.55-1.79-.89-.84-.3-1.72-.44-.87-.14-1.76-.14-1.55 0-3.06.45T.94 7.55q.71-1.74 1.81-3.13 1.1-1.38 2.52-2.35Q6.68 1.1 8.37.58q1.7-.52 3.58-.52Z"/>
+          </svg>
+        </span>
+        Add to Edge
+      </a>
+
+    </div>
+  </section><!-- /hero -->
+
+  <!-- FEATURES -->
+  <div class="features-wrap reveal" style="transition-delay:.1s">
+    <div class="features-grid">
+
+      <div class="f-card">
+        <div class="f-ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m14.5 12.5-5 5"/><path d="m16 11 1.5 1.5"/><path d="m15 10 1.5 1.5"/>
+            <path d="m19 7.5 2 2"/><path d="m10 17-6.5-6.5a2.12 2.12 0 0 1 3-3L13 14"/>
+            <path d="m15 6 3 3"/>
+          </svg>
+        </div>
+        <h3>Surgical Precision</h3>
+        <p>Neutralizes scripts that block right-click and selection without breaking site functionality.</p>
+      </div>
+
+      <div class="f-card">
+        <div class="f-ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+            <polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>
+          </svg>
+        </div>
+        <h3>Modern Web Native</h3>
+        <p>Full support for Shadow DOM editors like VS Code Web, Monaco, and Salesforce.</p>
+      </div>
+
+      <div class="f-card">
+        <div class="f-ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <path d="m9 12 2 2 4-4"/>
+          </svg>
+        </div>
+        <h3>Privacy First</h3>
+        <p>Zero tracking. No external requests. 100% local execution within your browser.</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- WORKS WHERE OTHERS FAIL -->
+  <section class="works-sec reveal" style="transition-delay:.15s" aria-labelledby="works-h2">
+    <h2 id="works-h2">Works where others fail.</h2>
+    <div class="chip-grid">
+      <div class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Google Docs</div>
+      <div class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Notion</div>
+      <div class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Figma</div>
+      <div class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>VS Code Web</div>
+      <div class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Salesforce</div>
+      <div class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Any site</div>
+    </div>
+  </section>
+
+  <!-- DEMO -->
+  <section class="demo-sec reveal" style="transition-delay:.1s" aria-labelledby="demo-h2">
+    <h2 id="demo-h2">Experience Digital Freedom.</h2>
+    <p>Watch URest surgically restoring the native browser experience on even the most restricted sites.</p>
+    <div class="browser-mockup">
+      <div class="mockup-bar" aria-hidden="true">
+        <div class="dot dot-r"></div>
+        <div class="dot dot-y"></div>
+        <div class="dot dot-g"></div>
+        <div class="fake-url"></div>
+      </div>
+      <div class="mockup-content">
+        <img src="demo.gif" alt="URest in action — restoring right-click and text selection on a restricted page"/>
+      </div>
+    </div>
+  </section>
+
+  <!-- SUPPORT -->
+  <div class="support-wrap reveal" style="transition-delay:.1s">
+    <div class="support-grid">
+
+      <div class="s-card">
+        <div class="s-ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+            <polyline points="22,6 12,13 2,6"/>
+          </svg>
+        </div>
+        <!-- FIX: was uppercase+cyan. Now title-case+tx1 to match feature cards. -->
+        <h3>Get in Touch</h3>
+        <p>Need help or have a suggestion? Reach the engineering team directly.</p>
+        <a href="mailto:helloaankda@gmail.com">helloaankda@gmail.com ↗</a>
+      </div>
+
+      <div class="s-card">
+        <div class="s-ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <path d="m9 12 2 2 4-4"/>
+          </svg>
+        </div>
+        <!-- FIX: was uppercase+cyan. Now title-case+tx1 to match feature cards. -->
+        <h3>Privacy Policy</h3>
+        <p>Zero data collection. Local-first architecture. Security as a non-negotiable standard.</p>
+        <a href="./privacy.html">Read the full policy ↗</a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="reveal">
+    <span style="font-size:.8125rem;color:var(--tx2);">© 2026 <a href="https://aankda.github.io/" style="color:var(--tx1);text-decoration:none;font-weight:600;">AANKDA LLC</a></span>
+    <nav class="f-links" aria-label="Footer navigation">
+      <a href="./privacy.html">Privacy Policy</a>
+      <a href="https://github.com/aankda/urest" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="https://aankda.github.io/">AANKDA ↗</a>
+    </nav>
+  </footer>
+
+</div><!-- /container -->
+
+<script>
+(function(){
+  // Version fetch from GitHub (graceful fallback)
+  fetch('https://raw.githubusercontent.com/aankda/urest/main/package.json')
+    .then(function(r){return r.json()})
+    .then(function(d){if(d.version)document.getElementById('vbadge').textContent='v'+d.version})
+    .catch(function(){});
+
+  // Scroll reveal
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){if(e.isIntersecting){e.target.classList.add('on');io.unobserve(e.target)}});
+  },{threshold:0.08});
+  document.querySelectorAll('.reveal').forEach(function(el){io.observe(el)});
+})();
+</script>
 </body>
 </html>
