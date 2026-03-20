@@ -1,0 +1,48 @@
+{
+  "name": "urest",
+  "private": true,
+  "version": "1.0.1",
+  "description": "Universal Restoration for the Modern Web",
+  "author": "AANKDA LLC <helloaankda@gmail.com>",
+  "homepage": "https://github.com/aankda/urest",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aankda/urest.git"
+  },
+  "type": "module",
+  "license": "Proprietary",
+  "scripts": {
+    "dev": "vite",
+    "build:core": "tsc && vite build --outDir dist/core",
+    "build:chrome": "npm run build:core && rm -rf dist/chrome && cp -r dist/core dist/chrome",
+    "build:firefox": "npm run build:core && rm -rf dist/firefox && cp -r dist/core dist/firefox && node scripts/patch-firefox.js",
+    "build:edge": "npm run build:core && rm -rf dist/edge && cp -r dist/core dist/edge",
+    "build": "npm run build:chrome && npm run build:firefox && npm run build:edge",
+    "package": "npm run build && node scripts/package.js",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "lucide-react": "^0.294.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.254",
+    "@types/node": "^25.5.0",
+    "@types/react": "^18.2.37",
+    "@types/react-dom": "^18.2.15",
+    "@typescript-eslint/eslint-plugin": "^6.10.0",
+    "@typescript-eslint/parser": "^6.10.0",
+    "@vitejs/plugin-react": "^4.2.0",
+    "autoprefixer": "^10.4.16",
+    "eslint": "^8.53.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.4",
+    "postcss": "^8.4.31",
+    "tailwindcss": "^3.3.5",
+    "terser": "^5.46.0",
+    "typescript": "^5.2.2",
+    "vite": "^5.0.0"
+  }
+}
